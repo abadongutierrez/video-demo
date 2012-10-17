@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html ng-app>
+<head>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script type="text/javascript" src="dpd.js"></script>
+    <script src="lib/angular/angular.js"></script>
+    <script type="text/javascript">
+    function ProductsCtrl($scope, $http) {
+        $scope.newProduct = {};
+        $http.get('products').success(function(data) {
+            $scope.products = data;
+        });
+        $scope.submit = function() {
+            $http.post('products', $scope.newProduct).success(function() {
+                $scope.message = "New Product Added";
+                $scope.newProduct = {};
+                $http.get('products').success(function(data) {
+                    $scope.products = data;
+                });
+            })
+            .error(function(data) {
+                $scope.errors = data.errors;
+            });
+            return false;   
+        };
+        $scope.updatePurchased = function(idProduct) {
+            $http.get('products/' + idProduct).success(function(data) {
+                data.purchased = !data.purchased;
+                $http.put('products/' + idProduct, data).success(function() {
+                    $scope.message = "Product Updated";
+                    $http.get('products').success(function(data) {
+                        $scope.products = data;
+                    });
+                })
+                .error(function(data) {
+                    $scope.message = data.message;
+                });
+            });
+        };
+        $scope.delete = function(idProduct) {
+            $http.delete('products/' + idProduct).success(function(data) {
+                $scope.message = "Product Deleted";
+                $http.get('products').success(function(data) {
+                    $scope.products = data;
+                });
+            })
+            .error(function(data) {
+                $scope.message = data.message;
+            });
+        };
+    }
+    </script>
+</head>
+<body ng-controller="ProductsCtrl">
+	<h1>Product List</h1>
+    <p>{{message}}</p>
+    <ul>
+        <li ng-repeat="error in errors">
+            {{error | json}}
+        </li>
+    </ul>
+    <form ng-submit="submit()">
+        <input type="text" ng-model="newProduct.title" placeholder="Title" required />
+        <input type="number" ng-model="newProduct.price" placeholder="Price" required />
+        <input type="submit" value="Add" />
+    </form>
+    <ul>
+        <li ng-repeat="p in products">
+            <input type="checkbox" ng-click="updatePurchased(p.id)" ng-checked="p.purchased"></input> {{p.title}} - {{p.price | currency}} <button ng-click="delete(p.id)">X</button>
+        </li>
+    </ul>
+</body>
+</html>
