@@ -1,1 +1,1 @@
-cancel("You cant delete a product!");
+//cancel("You cant delete a product!");
