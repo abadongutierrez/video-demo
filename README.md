@@ -1,4 +1,4 @@
-We need deployd installed before run:
+We need to install deployd before run:
 
 http://www.deployd.com/download.html
 
